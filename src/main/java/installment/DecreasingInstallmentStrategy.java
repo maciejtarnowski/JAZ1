@@ -1,6 +1,8 @@
 package installment;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import credit.Installment;
 import credit.Monetary;
@@ -8,22 +10,48 @@ import credit.Monetary;
 public class DecreasingInstallmentStrategy implements InstallmentStrategy {
 
 	@Override
-	public Installment calculate(Integer installmentNumber, Monetary grossAmount, Integer numberOfInstallments, Double interestRate) throws InstallmentStrategyException {
-		if (installmentNumber < 1 || grossAmount == null || numberOfInstallments < 1 || interestRate < 0.0) {
+	public List<Installment> calculate(Monetary creditAmount, Monetary fixedFee, Integer numberOfInstallments, Double interestRate) throws InstallmentStrategyException {
+		if (creditAmount == null || fixedFee == null || numberOfInstallments < 1 || interestRate < 0.0) {
 			throw new InstallmentStrategyException("Invalid input data");
 		}
-		return new Installment(installmentNumber, calculateInstallment(installmentNumber, grossAmount, numberOfInstallments, interestRate));
+		
+		List<Installment> installments = new ArrayList<Installment>();
+		
+		for (int installmentNumber = 1; installmentNumber <= numberOfInstallments; installmentNumber++) {
+			installments.add(
+				new Installment(
+					installmentNumber,
+					calculatePrincipalAmount(creditAmount, numberOfInstallments),
+					calculateInterestAmount(installmentNumber, creditAmount, numberOfInstallments, interestRate),
+					calculateFixedFeeAmount(fixedFee, numberOfInstallments)
+				)
+			);
+		}
+		
+		return installments;
 	}
 
-	/**
-	 * http://www.matematykafinansowa.pl/jak-wyliczyc-rate-malejaca-kredytu/
-	 */
-	private Monetary calculateInstallment(Integer installmentNumber, Monetary grossAmount, Integer numberOfInstallments, Double interestRate) {
-		Double creditAmount = grossAmount.getValue().doubleValue();
-		Double monthlyInterest = interestRate / 12;
+	private Monetary calculatePrincipalAmount(Monetary creditAmount, Integer numberOfInstallments) {
+		BigDecimal creditValue = creditAmount.getValue();
 		
-		Double amount = (creditAmount / numberOfInstallments) * (1 + (numberOfInstallments - installmentNumber + 1) * monthlyInterest);
+		return new Monetary(creditValue.divide(BigDecimal.valueOf(numberOfInstallments), 2, BigDecimal.ROUND_HALF_EVEN), creditAmount.getCurrency());
+	}
+	
+	private Monetary calculateInstallmentAmount(Integer installmentNumber, Monetary creditAmount, Integer numberOfInstallments, Double interestRate) {
+		BigDecimal monthlyInterest = BigDecimal.valueOf(interestRate / 12).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+		BigDecimal creditValue = creditAmount.getValue();
 		
-		return new Monetary(BigDecimal.valueOf(amount), grossAmount.getCurrency());
+		BigDecimal amount = creditValue.divide(BigDecimal.valueOf(numberOfInstallments), 2, BigDecimal.ROUND_HALF_EVEN).multiply(monthlyInterest.multiply(BigDecimal.valueOf(numberOfInstallments - installmentNumber + 1)).add(BigDecimal.valueOf(1)));
+		
+		return new Monetary(amount, creditAmount.getCurrency());
+	}
+	
+	private Monetary calculateInterestAmount(Integer installmentNumber, Monetary creditAmount, Integer numberOfInstallments, Double interestRate) {
+		return new Monetary(calculateInstallmentAmount(installmentNumber, creditAmount, numberOfInstallments, interestRate).getValue().subtract(calculatePrincipalAmount(creditAmount, numberOfInstallments).getValue()), creditAmount.getCurrency());
+	}
+	
+	private Monetary calculateFixedFeeAmount(Monetary fixedFee, Integer numberOfInstallments) {
+		BigDecimal fixedFeeValue = fixedFee.getValue();
+		return new Monetary(fixedFeeValue.divide(BigDecimal.valueOf(numberOfInstallments), 2, BigDecimal.ROUND_HALF_EVEN), fixedFee.getCurrency());
 	}
 }

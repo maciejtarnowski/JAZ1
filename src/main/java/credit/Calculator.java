@@ -16,19 +16,13 @@ public class Calculator {
 	}
 	
 	private List<Installment> calculateInstallments(InputParameters inputParameters) throws CalculatorException {
-		List<Installment> installments = new ArrayList<Installment>();
 		InstallmentStrategy installmentStrategy = getInstallmentStrategy(inputParameters.getInstallmentsType());
-		Monetary grossAmount = new Monetary(inputParameters.getAmount().getValue().add(inputParameters.getFixedFee().getValue()), inputParameters.getAmount().getCurrency());
 		
-		for (int installmentNumber = 1; installmentNumber <= inputParameters.getNumberOfInstallments(); installmentNumber++) {
-			try {
-				installments.add(installmentStrategy.calculate(installmentNumber, grossAmount, inputParameters.getNumberOfInstallments(), inputParameters.getInterestRate()));
-			} catch (InstallmentStrategyException ex) {
-				throw getCalculatorException(ex.getMessage());
-			}
+		try {
+			return installmentStrategy.calculate(inputParameters.getAmount(), inputParameters.getFixedFee(), inputParameters.getNumberOfInstallments(), inputParameters.getInterestRate());
+		} catch (InstallmentStrategyException ex) {
+			throw getCalculatorException(ex.getMessage());
 		}
-		
-		return installments;
 	}
 	
 	private InstallmentStrategy getInstallmentStrategy(Integer installmentType) throws CalculatorException {

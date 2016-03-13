@@ -8,11 +8,11 @@ import credit.Monetary;
 public class FixedInstallmentStrategy implements InstallmentStrategy {
 
 	@Override
-	public Installment calculate(Integer installmentNumber, Monetary grossAmount, Integer numberOfInstallments, Double interestRate) throws InstallmentStrategyException {
-		if (installmentNumber < 1 || grossAmount == null || numberOfInstallments < 1 || interestRate < 0.0) {
+	public List<Installment> calculate(Monetary creditAmount, Monetary fixedFee, Integer numberOfInstallments, Double interestRate) throws InstallmentStrategyException {
+		if (creditAmount == null || numberOfInstallments < 1 || interestRate < 0.0) {
 			throw new InstallmentStrategyException("Invalid input data");
 		}
-		return new Installment(installmentNumber, calculateAmount(grossAmount, numberOfInstallments, interestRate));
+		return new Installment(installmentNumber, calculateAmount(creditAmount, numberOfInstallments, interestRate));
 	}
 
 	/**
