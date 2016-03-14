@@ -3,6 +3,10 @@
   <groupId>pl.edu.pjatk</groupId>
   <artifactId>jazzad1</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
   <name>JAZZad1</name>
   <dependencies>
     <dependency>
@@ -23,5 +27,32 @@
     	<version>3.3.0</version>
     	<scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>javax.servlet</groupId>
+    	<artifactId>javax.servlet-api</artifactId>
+    	<version>3.1.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>javax</groupId>
+    	<artifactId>javaee-web-api</artifactId>
+    	<version>7.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>com.github.jknack</groupId>
+    	<artifactId>handlebars</artifactId>
+    	<version>4.0.4</version>
+    </dependency>
   </dependencies>
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.eclipse.jetty</groupId>
+  			<artifactId>jetty-maven-plugin</artifactId>
+  			<version>9.3.7.v20160115</version>
+  			<configuration>
+  			   <scanIntervalSeconds>5</scanIntervalSeconds>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
 </project>

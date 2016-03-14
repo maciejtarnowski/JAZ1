@@ -1,22 +1,26 @@
 package credit;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import installment.FactoryException;
 import installment.InstallmentStrategy;
 import installment.InstallmentStrategyException;
 import installment.InstallmentStrategyFactory;
+import installment.InstallmentType;
 
 public class Calculator {
 	private InstallmentStrategyFactory strategyFactory;
+	
+	public Calculator(InstallmentStrategyFactory strategyFactory) {
+		this.strategyFactory = strategyFactory;
+	}
 	
 	public CreditParameters calculate(InputParameters inputParameters) throws CalculatorException {
 		return new CreditParameters(inputParameters, calculateInstallments(inputParameters));
 	}
 	
 	private List<Installment> calculateInstallments(InputParameters inputParameters) throws CalculatorException {
-		InstallmentStrategy installmentStrategy = getInstallmentStrategy(inputParameters.getInstallmentsType());
+		InstallmentStrategy installmentStrategy = getInstallmentStrategy(InstallmentType.values()[inputParameters.getInstallmentsType() - 1]);
 		
 		try {
 			return installmentStrategy.calculate(inputParameters.getAmount(), inputParameters.getFixedFee(), inputParameters.getNumberOfInstallments(), inputParameters.getInterestRate());
@@ -25,7 +29,7 @@ public class Calculator {
 		}
 	}
 	
-	private InstallmentStrategy getInstallmentStrategy(Integer installmentType) throws CalculatorException {
+	private InstallmentStrategy getInstallmentStrategy(InstallmentType installmentType) throws CalculatorException {
 		try {
 			return strategyFactory.get(installmentType);
 		} catch (FactoryException ex) {

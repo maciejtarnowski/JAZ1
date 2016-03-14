@@ -1,6 +1,7 @@
 package installment;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import credit.Installment;
 import credit.Monetary;
@@ -12,7 +13,8 @@ public class FixedInstallmentStrategy implements InstallmentStrategy {
 		if (creditAmount == null || numberOfInstallments < 1 || interestRate < 0.0) {
 			throw new InstallmentStrategyException("Invalid input data");
 		}
-		return new Installment(installmentNumber, calculateAmount(creditAmount, numberOfInstallments, interestRate));
+		return null;
+//		return new Installment(installmentNumber, calculateAmount(creditAmount, numberOfInstallments, interestRate));
 	}
 
 	/**
