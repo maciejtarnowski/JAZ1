@@ -24,16 +24,11 @@ public class InstallmentStrategyFactoryTest {
 	
 	@Test
 	public void itReturnsFixedInstallmentStrategy() throws FactoryException {
-		assertThat(subject.get(InstallmentStrategy.TYPE_FIXED)).isInstanceOf(FixedInstallmentStrategy.class);
+		assertThat(subject.get(InstallmentType.FIXED)).isInstanceOf(FixedInstallmentStrategy.class);
 	}
 
 	@Test
 	public void itReturnsDecreasingInstallmentStrategy() throws FactoryException {
-		assertThat(subject.get(InstallmentStrategy.TYPE_DECREASING)).isInstanceOf(DecreasingInstallmentStrategy.class);
-	}
-	
-	@Test
-	public void itThrowsFactoryExceptionOnUnknownTypes() {
-		assertThatExceptionOfType(FactoryException.class).isThrownBy(() -> { subject.get(123); });
+		assertThat(subject.get(InstallmentType.DECREASING)).isInstanceOf(DecreasingInstallmentStrategy.class);
 	}
 }
