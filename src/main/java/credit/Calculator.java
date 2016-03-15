@@ -20,7 +20,7 @@ public class Calculator {
 	}
 	
 	private List<Installment> calculateInstallments(InputParameters inputParameters) throws CalculatorException {
-		InstallmentStrategy installmentStrategy = getInstallmentStrategy(InstallmentType.values()[inputParameters.getInstallmentsType() - 1]);
+		InstallmentStrategy installmentStrategy = getInstallmentStrategy(InstallmentType.fromOrdinal(inputParameters.getInstallmentsType() - 1));
 		
 		try {
 			return installmentStrategy.calculate(inputParameters.getAmount(), inputParameters.getFixedFee(), inputParameters.getNumberOfInstallments(), inputParameters.getInterestRate());
