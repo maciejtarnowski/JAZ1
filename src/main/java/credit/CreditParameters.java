@@ -3,6 +3,8 @@ package credit;
 import java.math.BigDecimal;
 import java.util.List;
 
+import installment.InstallmentType;
+
 public class CreditParameters {
 	private InputParameters inputParameters;
 	private List<Installment> installments;
@@ -10,6 +12,18 @@ public class CreditParameters {
 	public CreditParameters(InputParameters inputParameters, List<Installment> installments) {
 		this.inputParameters = inputParameters;
 		this.installments = installments;
+	}
+	
+	public Monetary getNetAmount() {
+		return inputParameters.getAmount();
+	}
+	
+	public Monetary getFixedFee() {
+		return inputParameters.getFixedFee();
+	}
+	
+	public InstallmentType getInstallmentType() {
+		return InstallmentType.fromOrdinal(inputParameters.getInstallmentsType() - 1);
 	}
 	
 	public Monetary getGrossAmount() {

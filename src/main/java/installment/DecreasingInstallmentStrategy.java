@@ -22,7 +22,7 @@ public class DecreasingInstallmentStrategy implements InstallmentStrategy {
 				new Installment(
 					installmentNumber,
 					calculatePrincipalAmount(creditAmount, numberOfInstallments),
-					calculateInterestAmount(installmentNumber, creditAmount, numberOfInstallments, interestRate),
+					calculateInterestAmount(installmentNumber, creditAmount, fixedFee, numberOfInstallments, interestRate),
 					calculateFixedFeeAmount(fixedFee, numberOfInstallments)
 				)
 			);
@@ -37,17 +37,20 @@ public class DecreasingInstallmentStrategy implements InstallmentStrategy {
 		return new Monetary(creditValue.divide(BigDecimal.valueOf(numberOfInstallments), 2, BigDecimal.ROUND_HALF_EVEN), creditAmount.getCurrency());
 	}
 	
-	private Monetary calculateInstallmentAmount(Integer installmentNumber, Monetary creditAmount, Integer numberOfInstallments, Double interestRate) {
-		BigDecimal monthlyInterest = BigDecimal.valueOf(interestRate / 12).setScale(2, BigDecimal.ROUND_HALF_EVEN);
-		BigDecimal creditValue = creditAmount.getValue();
+	private Monetary calculateInstallmentAmount(Integer installmentNumber, Monetary creditAmount, Monetary fixedFee, Integer numberOfInstallments, Double interestRate) {
+		BigDecimal monthlyInterest = BigDecimal.valueOf(interestRate / 100 / 12);
+		BigDecimal creditValue = creditAmount.getValue().add(fixedFee.getValue());
 		
-		BigDecimal amount = creditValue.divide(BigDecimal.valueOf(numberOfInstallments), 2, BigDecimal.ROUND_HALF_EVEN).multiply(monthlyInterest.multiply(BigDecimal.valueOf(numberOfInstallments - installmentNumber + 1)).add(BigDecimal.valueOf(1)));
+		BigDecimal principal = creditValue.divide(BigDecimal.valueOf(numberOfInstallments), 2, BigDecimal.ROUND_HALF_EVEN);
+		BigDecimal interestMultiplier = BigDecimal.valueOf(numberOfInstallments - installmentNumber + 1).multiply(monthlyInterest).add(BigDecimal.valueOf(1));
+		
+		BigDecimal amount = principal.multiply(interestMultiplier).subtract(calculateFixedFeeAmount(fixedFee, numberOfInstallments).getValue());
 		
 		return new Monetary(amount, creditAmount.getCurrency());
 	}
 	
-	private Monetary calculateInterestAmount(Integer installmentNumber, Monetary creditAmount, Integer numberOfInstallments, Double interestRate) {
-		return new Monetary(calculateInstallmentAmount(installmentNumber, creditAmount, numberOfInstallments, interestRate).getValue().subtract(calculatePrincipalAmount(creditAmount, numberOfInstallments).getValue()), creditAmount.getCurrency());
+	private Monetary calculateInterestAmount(Integer installmentNumber, Monetary creditAmount, Monetary fixedFee, Integer numberOfInstallments, Double interestRate) {
+		return new Monetary(calculateInstallmentAmount(installmentNumber, creditAmount, fixedFee, numberOfInstallments, interestRate).getValue().subtract(calculatePrincipalAmount(creditAmount, numberOfInstallments).getValue()), creditAmount.getCurrency());
 	}
 	
 	private Monetary calculateFixedFeeAmount(Monetary fixedFee, Integer numberOfInstallments) {

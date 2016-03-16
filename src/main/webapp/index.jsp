@@ -35,11 +35,11 @@
     <p>
         <label>
             Raty stałe:
-            <input type="radio" name="installment_type" value="0" checked="checked">
+            <input type="radio" name="installment_type" value="1" checked="checked">
         </label>
         <label>
             Raty malejące:
-            <input type="radio" name="installment_type" value="1">
+            <input type="radio" name="installment_type" value="2">
         </label>
     </p>
     <p>
